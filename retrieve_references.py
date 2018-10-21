@@ -27,6 +27,8 @@ def getRefsByRole(obj, aut_role, creator_names):
             if role['marc21Code'] == aut_role :
                 docs = role['doc']
                 date = ""
+                edition = ""
+                publisher = ""
                 if len(docs) > 0 :
                     for d in docs:
                         if d['referentiel'] == 'sudoc':
@@ -39,7 +41,8 @@ def getRefsByRole(obj, aut_role, creator_names):
                                 publisher = edition_list[0].split(":")[-1]
                                 if len(edition_list) > 1:
                                     date_litt = edition_list[1]
-                                    date = re.search("([0-9]{4})", date_litt).group()
+                                    if hasattr(date_litt, 'group'):
+                                        date = re.search("([0-9]{4})", date_litt).group()
                             i = {'id':d['id'],'source':d['referentiel'],'itemtype':itemtype,'author': creator_names, 'title': title,'publisher': publisher, 'edition': edition, 'date': date, 'url': d['URL']}
                         elif d['referentiel'] == 'bnf':
                             citation = d['citation'].split("/")
@@ -47,7 +50,6 @@ def getRefsByRole(obj, aut_role, creator_names):
                             title = citation[0]
                             if len(citation) > 2:
                                 edition = citation[2]
-                                date = ""
                                 date = re.search("([0-9]{4})", edition).group()
                             i = {'id':d['id'],'source':d['referentiel'],'itemtype':itemtype,'author': creator_names, 'title': title,'edition': edition, 'date': date, 'url': d['URL']}
                         elif d['referentiel'] == 'theses':
