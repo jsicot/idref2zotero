@@ -18,14 +18,13 @@ for researcher in researchers:
     total_items = len(biblio)
 
     print(f"Pushing {total_items} items in Zotero bibliography : {collection_name}")
-    
+    collection_id = pyzot.create_collection(collection_name)
+    # print(collection_id)
+
     for i in range(0, total_items, 50):
         start = i
         if i+50 <= total_items:
             end = i+50
         else :
             end = total_items
-        pyzot.create_collection(collection_name, list(islice(biblio, start, end)))
-
-
-
+        pyzot.create_items(collection_id, list(islice(biblio, start, end)))
