@@ -26,9 +26,9 @@ def getRefsByRole(obj, aut_role, creator_names):
         for role in refs :
             if role['marc21Code'] == aut_role :
                 docs = role['doc']
+                date = ""
                 if len(docs) > 0 :
                     for d in docs:
-
                         if d['referentiel'] == 'sudoc':
                             citation = d['citation'].split("/")
                             itemtype = 'book'
@@ -38,10 +38,9 @@ def getRefsByRole(obj, aut_role, creator_names):
                                 edition_list = citation[2].split(",")
                                 publisher = edition_list[0].split(":")[-1]
                                 if len(edition_list) > 1:
-                                    date = ""
                                     date_litt = edition_list[1]
                                     date = re.search("([0-9]{4})", date_litt).group()
-                            i = {'id':d['id'],'source':d['referentiel'],'itemtype':itemtype,'author': creator_names, 'title': title,'publisher': publisher, 'edition': edition, 'date': date, 'url': d['URI']}
+                            i = {'id':d['id'],'source':d['referentiel'],'itemtype':itemtype,'author': creator_names, 'title': title,'publisher': publisher, 'edition': edition, 'date': date, 'url': d['URL']}
                         elif d['referentiel'] == 'bnf':
                             citation = d['citation'].split("/")
                             itemtype = 'book'
@@ -50,13 +49,13 @@ def getRefsByRole(obj, aut_role, creator_names):
                                 edition = citation[2]
                                 date = ""
                                 date = re.search("([0-9]{4})", edition).group()
-                            i = {'id':d['id'],'source':d['referentiel'],'itemtype':itemtype,'author': creator_names, 'title': title,'edition': edition, 'date': date, 'url': d['URI']}
+                            i = {'id':d['id'],'source':d['referentiel'],'itemtype':itemtype,'author': creator_names, 'title': title,'edition': edition, 'date': date, 'url': d['URL']}
                         elif d['referentiel'] == 'theses':
                             itemtype = 'thesis'
-                            i = {'id':d['id'],'itemtype':itemtype,'source':d['referentiel'],'author': creator_names,'title': d['citation'],'url': d['URI']}
+                            i = {'id':d['id'],'itemtype':itemtype,'source':d['referentiel'],'author': creator_names,'title': d['citation'],'url': d['URL']}
                         else :
                             itemtype = 'journalArticle'
-                            i = {'id':d['id'],'itemtype':itemtype,'source':d['referentiel'],'author': creator_names,'title': d['citation'],'url': d['URI']}
+                            i = {'id':d['id'],'itemtype':itemtype,'source':d['referentiel'],'author': creator_names,'title': d['citation'],'url': d['URL']}
                         #print(i)
                         biblio.append(i)
     items = []
