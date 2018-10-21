@@ -25,37 +25,44 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
-
 import json
+import yaml
 import re
 from pyzotero import zotero
 
-def create_collection(collection_name, items):
+with open("config.yml", 'r') as ymlfile:
+    cfg = yaml.safe_load(ymlfile)
+    
+zot = zotero.Zotero(cfg['zot_library_id'],cfg['zot_library_type'],cfg['zot_api_key'])
+
+def create_collection(collection_name):
     test_collection = dict([
         ('name', collection_name)
     ])
-
     collections_data = json.loads(json.dumps(zot.collections()))
-    
+    collection_id = ""
     #testing if collection exists
     for collection in  collections_data:
             if collection['data']['name'] == collection_name:
                 collection_id = collection['data']['key']
-                print("Reusing existing collection…")
+                print(f"Reusing existing collection with key {collection_id}…")
 
-    if len(collection_id) < 0:
+    if  not collection_id:
         response = zot.create_collection([test_collection])
         collection_result = json.loads(json.dumps(response))
-        print("Creating collection…")
+        print(f"Creating collection {collection_name}…")
         collection_id = collection_result['success']['0']
+    
+    return collection_id
 
+def create_items(collection_id, items):
     print("Creating items…")
     created_items = zot.create_items(items)
     # print(created_items)
     for key in created_items['successful'].keys():
         print("Retrieve item…")
         item = zot.item(created_items['successful'][key]['key'])
-        print("Add item to Collection…")
+        print(f"Add item to Collection {collection_id}…")
         zot.addto_collection(collection_id, item)
 
 def prepare_item(item):
@@ -74,6 +81,7 @@ def prepare_item(item):
     if 'date' in item.keys():
         template['date'] = item['date']   
     template['url'] = item['url']
+    template['extra'] = item['id']
     template['libraryCatalog'] = item['source']
     
     return template
@@ -89,8 +97,3 @@ def creators_list(creator_names, creator_type):
     
     return creators
 
-zot_library_id = "YOUR_ZOTERO_LIBRARY_ID"
-zot_library_type = "YOUR_ZOTERO_LIBRARY_TYPE"
-zot_api_key = "YOUR_ZOTERO_API_KEY"
-# Zotero Api Init
-zot = zotero.Zotero(zot_library_id, zot_library_type, zot_api_key)
